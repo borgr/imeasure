@@ -12,6 +12,7 @@
 import numpy
 import copy
 import os
+from six.moves import xrange
 
 class Alignment:
     DUMMY = ''
@@ -251,28 +252,28 @@ class Alignment:
         while i < len(alignment[0]):
             maxlen.append(max(len(str(x[i])) for x in alignment))
             if linelen + maxlen[i] < maxcols:
-                print str(alignment[0][i]).ljust(maxlen[i]) + ' ' * wordspacing,
+                print( str(alignment[0][i]).ljust(maxlen[i]) + ' ' * wordspacing,)
                 linelen += maxlen[i] + wordspacing + 1
             else:
                 for j in xrange(1,len(alignment)):
-                    print "\n", # New line
+                    print( "\n", )# New line
                     for k in range(start, i):
-                        print str(alignment[j][k]).ljust(maxlen[k]) + ' ' * wordspacing,
+                        print( str(alignment[j][k]).ljust(maxlen[k]) + ' ' * wordspacing,)
                 # Move to a new line
                 # Add left margin
                 for j in xrange(len(alignment)):
                     alignment[j].insert(i, ' ' * lmargin)
                 maxlen[i] = lmargin
-                print "\n" * linespacing, # New line
-                print str(alignment[0][i]).ljust(maxlen[i]) + ' ' * wordspacing,
+                print( "\n" * linespacing, )# New line
+                print( str(alignment[0][i]).ljust(maxlen[i]) + ' ' * wordspacing,)
                 linelen = maxlen[i] + wordspacing + 1
                 start = i
             i += 1
         for j in xrange(1,len(alignment)):
-            print "\n", # New line
+            print( "\n", )# New line
             for k in range(start, i):
-                print str(alignment[j][k]).ljust(maxlen[k]) + ' ' * wordspacing,
-        print ""
+                print( str(alignment[j][k]).ljust(maxlen[k]) + ' ' * wordspacing,)
+        print( "")
 
 
 if __name__ == '__main__':
@@ -287,7 +288,7 @@ if __name__ == '__main__':
 
     # Get the alignment.
     alignment = Alignment(a,b,c)
-    print "COST:", alignment.cost
-    print "LEN:", alignment.length
+    print( "COST:", alignment.cost)
+    print( "LEN:", alignment.length)
     alignment.printme(headers=["SRC:", "HYP:", "REF:"])
     

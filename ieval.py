@@ -40,9 +40,11 @@ import candgen as CG
 import align as ALIGN
 import math
 import sys
-
-reload(sys)
-sys.setdefaultencoding('utf-8')
+import six
+from six.moves import xrange
+# from six.moves import reload_module
+# reload_module(sys)
+# sys.setdefaultencoding('utf-8')
 
 ### GLOBALS ###
 
@@ -219,7 +221,7 @@ def get_best_ref_counts(sid, src, hyp, ref_list, cur_sys_counts, cur_base_counts
                    C:{TP:-1,TN:-1,FP:-1,FN:-1,P:-1,R:-1,F:-1,ACC:-1,WACC:-1,I:-1} }
 
     if v_verbose:
-        print "Number of references:", len(ref_list)
+        print ("Number of references:", len(ref_list))
         
     for i in xrange(len(ref_list)):
         ref = ref_list[i]
@@ -271,15 +273,15 @@ def get_best_ref_counts(sid, src, hyp, ref_list, cur_sys_counts, cur_base_counts
             max_scores = comparative_scores
 
         if v_verbose:
-            print "\nReference:", i, "\n"
+            print ("\nReference:", i, "\n")
             ref_alignment.printme()
-            print "\nReference counts:", ref_counts
-            print "Reference scores:", ref_scores
-            print "Baseline counts:", base_counts
-            print "Baseline scores:", base_scores
-            print "Cumulative baseline scores:", cum_base_scores
-            print "Cumulative system scores:", cum_sys_scores
-            print "Maximum system scores:", max_scores
+            print ("\nReference counts:", ref_counts)
+            print ("Reference scores:", ref_scores)
+            print ("Baseline counts:", base_counts)
+            print ("Baseline scores:", base_scores)
+            print ("Cumulative baseline scores:", cum_base_scores)
+            print ("Cumulative system scores:", cum_sys_scores)
+            print ("Maximum system scores:", max_scores)
             
     # -- END FOR
 
@@ -294,30 +296,30 @@ def get_best_ref_counts(sid, src, hyp, ref_list, cur_sys_counts, cur_base_counts
             print_rows(best_ref_scores, best_base_scores, sid)
         if v_verbose:
             # Best reference results
-            print "\nBest reference:", best_ref, "\n"
+            print ("\nBest reference:", best_ref, "\n")
             best_ref_alignment.printme()
-            print "\nCounts:", best_ref_counts
-            print "Scores:", best_ref_scores
-            print "Baseline counts:", best_base_counts
-            print "Baseline scores:", best_base_scores
+            print ("\nCounts:", best_ref_counts)
+            print ("Scores:", best_ref_scores)
+            print ("Baseline counts:", best_base_counts)
+            print ("Baseline scores:", best_base_scores)
 
     return best_ref, best_ref_counts, best_base_counts
 
 def print_info(file_ref, file_hyp, max_a, max_m, optimise, b, w):
-    print "---------------------------------------------------------------------------------------------------------------------"
-    print "Hypothesis file    :", file_hyp
-    print "Gold standard file :", file_ref
-    print "Maximising metric  :", max_m.upper(), "-", 'DETECTION' if max_a == D else 'CORRECTION'
-    print "Optimise for       :", 'SENTENCE' if optimise == SENTENCE else 'CORPUS'
-    print "WAcc weight        :", w
-    print "F beta             :", b
-    print "---------------------------------------------------------------------------------------------------------------------"
+    print ("---------------------------------------------------------------------------------------------------------------------")
+    print ("Hypothesis file    :", file_hyp)
+    print ("Gold standard file :", file_ref)
+    print ("Maximising metric  :", max_m.upper(), "-", 'DETECTION' if max_a == D else 'CORRECTION')
+    print ("Optimise for       :", 'SENTENCE' if optimise == SENTENCE else 'CORPUS')
+    print ("WAcc weight        :", w)
+    print ("F beta             :", b)
+    print ("---------------------------------------------------------------------------------------------------------------------")
 
 def print_header(per_sent=False):
     cols = "SID     Asp.  " if per_sent else "Aspect        "
-    print "---------------------------------------------------------------------------------------------------------------------"
-    print cols + "    TP      TN      FP      FN     FPN       P       R  F_{:3.2f}     Acc   Acc_b    WAcc  WAcc_b       I ".format(b)
-    print "---------------------------------------------------------------------------------------------------------------------"
+    print ("---------------------------------------------------------------------------------------------------------------------")
+    print (cols + "    TP      TN      FP      FN     FPN       P       R  F_{:3.2f}     Acc   Acc_b    WAcc  WAcc_b       I ".format(b))
+    print ("---------------------------------------------------------------------------------------------------------------------")
 
 def print_rows(ss, sb, sid=None):
     if sid:
@@ -327,17 +329,16 @@ def print_rows(ss, sb, sid=None):
         aspect_d = "Detection   "
         aspect_c = "Correction  "
     
-    print aspect_d + "  {:6d}  {:6d}  {:6d}  {:6d}  {:6d}  {:6.2f}  {:6.2f}  {:6.2f}  {:6.2f}  {:6.2f}  {:6.2f}  {:6.2f}  {:6.2f}".format(
+    print (aspect_d + "  {:6d}  {:6d}  {:6d}  {:6d}  {:6d}  {:6.2f}  {:6.2f}  {:6.2f}  {:6.2f}  {:6.2f}  {:6.2f}  {:6.2f}  {:6.2f}".format(
            ss[D][TP], ss[D][TN], ss[D][FP], ss[D][FN], ss[D][FPN], 
            ss[D][P]*100, ss[D][R]*100, ss[D][F]*100, ss[D][ACC]*100, 
-           sb[D][ACC]*100, ss[D][WACC]*100, sb[D][WACC]*100, ss[D][I]*100)
-    print aspect_c + "  {:6d}  {:6d}  {:6d}  {:6d}  {:6d}  {:6.2f}  {:6.2f}  {:6.2f}  {:6.2f}  {:6.2f}  {:6.2f}  {:6.2f}  {:6.2f}".format(
+           sb[D][ACC]*100, ss[D][WACC]*100, sb[D][WACC]*100, ss[D][I]*100))
+    print (aspect_c + "  {:6d}  {:6d}  {:6d}  {:6d}  {:6d}  {:6.2f}  {:6.2f}  {:6.2f}  {:6.2f}  {:6.2f}  {:6.2f}  {:6.2f}  {:6.2f}".format(
            ss[C][TP], ss[C][TN], ss[C][FP], ss[C][FN], ss[C][FPN], 
            ss[C][P]*100, ss[C][R]*100, ss[C][F]*100, ss[C][ACC]*100, 
-           sb[C][ACC]*100, ss[C][WACC]*100, sb[C][WACC]*100, ss[C][I]*100)
+           sb[C][ACC]*100, ss[C][WACC]*100, sb[C][WACC]*100, ss[C][I]*100))
 
 ### MAIN ###
-
 # Help
 help_str = \
 '''
@@ -360,110 +361,136 @@ Usage: python ''' + sys.argv[0] + ''' -ref:<file> -hyp:<file> [-nomix] [-max:<me
 \t -vv    : Very verbose output.
 '''
 
-# Read parameters
-for i in range(1,len(sys.argv)):
-    if sys.argv[i].startswith("-ref:"):
-        file_ref = sys.argv[i][5:]
-    elif sys.argv[i].startswith("-hyp:"):
-        file_hyp = sys.argv[i][5:]
-    elif sys.argv[i].startswith("-max:"):
-        m = sys.argv[i].lower()
-        max_a, max_m = (m[5:6], m[6:]) # Split into aspect and metric
-        # Validate
-        if max_a not in (D,C) or max_m not in (TP,TN,FP,FN,P,R,F,ACC,WACC,I):
-            print "Invalid maximising metric:", max_a, max_m
-            max_a, max_m = max_metric
-            print "Rolling back to default:", max_a, max_m        
-    elif sys.argv[i].startswith("-opt:"):
-        opt = sys.argv[i][5:].lower()
-        # Validate
-        if opt in (SENTENCE, CORPUS):
-            optimise = opt
-        else:
-            print "Invalid optimisation parameter:", opt
-            print "Rolling back to default:", optimise
-    elif sys.argv[i].startswith("-b:"):
-        b = float(sys.argv[i][3:])
-    elif sys.argv[i].startswith("-w:"):
-        w = float(sys.argv[i][3:])
-    elif sys.argv[i] == "-nomix":
-        mix = False
-    elif sys.argv[i] == "-per-sent":
-        per_sent = True
-    elif sys.argv[i] == "-vv":
-        verbose  = True
-        v_verbose = True
-    elif sys.argv[i] == "-v":
-        verbose = True
+def main():
+  global max_a
+  global max_m
+  global optimise
+  global b
+  global w
+  global mix
+  global per_sent
+  # Read parameters
+  for i in range(1,len(sys.argv)):
+      if sys.argv[i].startswith("-ref:"):
+          file_ref = sys.argv[i][5:]
+      elif sys.argv[i].startswith("-hyp:"):
+          file_hyp = sys.argv[i][5:]
+      elif sys.argv[i].startswith("-max:"):
+          m = sys.argv[i].lower()
+          max_a, max_m = (m[5:6], m[6:]) # Split into aspect and metric
+          # Validate
+          if max_a not in (D,C) or max_m not in (TP,TN,FP,FN,P,R,F,ACC,WACC,I):
+              print ("Invalid maximising metric:", max_a, max_m)
+              max_a, max_m = max_metric
+              print ("Rolling back to default:", max_a, max_m        )
+      elif sys.argv[i].startswith("-opt:"):
+          opt = sys.argv[i][5:].lower()
+          # Validate
+          if opt in (SENTENCE, CORPUS):
+              optimise = opt
+          else:
+              print ("Invalid optimisation parameter:", opt)
+              print ("Rolling back to default:", optimise)
+      elif sys.argv[i].startswith("-b:"):
+          b = float(sys.argv[i][3:])
+      elif sys.argv[i].startswith("-w:"):
+          w = float(sys.argv[i][3:])
+      elif sys.argv[i] == "-nomix":
+          mix = False
+      elif sys.argv[i] == "-per-sent":
+          per_sent = True
+      elif sys.argv[i] == "-vv":
+          verbose  = True
+          v_verbose = True
+      elif sys.argv[i] == "-v":
+          verbose = True
 
-# Do we have what we need?
-if not file_ref or not file_hyp:
-    print help_str
-    exit(0)
+  # Do we have what we need?
+  if not file_ref or not file_hyp:
+      print (help_str)
+      exit(0)
+  return calculate_imeasure(file_ref, file_hyp, max_a, max_m, optimise, b, w, per_sent, mix, verbose)
 
-# Totals
-# System
-t_counts_sys  = Counter({ D:Counter({TP:0,TN:0,FP:0,FN:0,FPN:0}), 
-                          C:Counter({TP:0,TN:0,FP:0,FN:0,FPN:0}) })
-# Baseline
-t_counts_base = Counter({ D:Counter({TP:0,TN:0,FP:0,FN:0,FPN:0}),
-                          C:Counter({TP:0,TN:0,FP:0,FN:0,FPN:0}) })
+def add_counter_counter(c1, c2):
+  if six.PY2:
+    return c1 + c2
+  else:
+    res = Counter()
+    for key, val in c1.items():
+      res[key] = val + c2.get(key, 0)
+    for key, val in c2.items():
+      if key not in res:
+        res[key] = val  
+  return res
 
-cg = CG.CandidateGenerator()
-f_hyp = open(file_hyp,"r")
-context = ET.iterparse(file_ref, events=("start", "end"))
-context = iter(context)
-event, root = context.next()
+def calculate_imeasure(file_ref, file_hyp, max_a=max_a, max_m=max_m, optimise=optimise, b=b, w=w, per_sent=per_sent, mix=mix, verbose=False):
+  # Totals
+  # System
+  t_counts_sys  = Counter({ D:Counter({TP:0,TN:0,FP:0,FN:0,FPN:0}), 
+                            C:Counter({TP:0,TN:0,FP:0,FN:0,FPN:0}) })
+  # Baseline
+  t_counts_base = Counter({ D:Counter({TP:0,TN:0,FP:0,FN:0,FPN:0}),
+                            C:Counter({TP:0,TN:0,FP:0,FN:0,FPN:0}) })
 
-print_info(file_ref, file_hyp, max_a, max_m, optimise, b, w)
+  cg = CG.CandidateGenerator()
+  f_hyp = open(file_hyp,"r")
+  context = ET.iterparse(file_ref, events=("start", "end"))
+  context = iter(context)
+  event, root = next(context)
 
-# Show results per sentence?
-if per_sent: 
-    print "\nSENTENCE RESULTS"
-    print_header(per_sent)
+  print_info(file_ref, file_hyp, max_a, max_m, optimise, b, w)
 
-# Read gold standard and process each sentence
-for event, elem in context:
-    if event == "end":
-        if elem.tag == "sentence":
-            sid = elem.get("id") # Sentence ID
-            if verbose:
-                print "\n" + "-"*40
-                print "Sentence", sid, ":", elem.find("text").text
-                print "-"*40
+  # Show results per sentence?
+  if per_sent: 
+      print ("\nSENTENCE RESULTS")
+      print_header(per_sent)
 
-            # Read hypothesis
-            hyp = f_hyp.readline().split()
-            src = elem.find("text").text.split()
-            # Get all possible valid references
-            ref_list = cg.get_candidates(elem, mix)
-            # Get the values for the best match among the references
-            best_ref, best_ref_counts, best_base_counts = \
-            get_best_ref_counts(sid, src, hyp, ref_list, t_counts_sys, t_counts_base, max_a, max_m, b, w, optimise, per_sent)
-            # Add to totals
-            t_counts_sys  = t_counts_sys + best_ref_counts
-            t_counts_base = t_counts_base + best_base_counts
-            
-            if verbose:
-                print "\nCUMULATIVE RESULTS:"
-                print "Cumulative system counts:", t_counts_sys
-                print "Cumulative system scores:", compute_all(t_counts_sys, t_counts_base)
-                print "Cumulative baseline counts:", t_counts_base
-                print "Cumulative baseline scores:", compute_all(t_counts_base)
-            
-            # Free up
-            elem.clear()
-        elif elem.tag == "script":
-            # Free up processed elements
-            elem.clear()
-            root.clear()
-f_hyp.close()
+  # Read gold standard and process each sentence
+  for event, elem in context:
+      if event == "end":
+          if elem.tag == "sentence":
+              sid = elem.get("id") # Sentence ID
+              if verbose:
+                  print ("\n" + "-"*40)
+                  print ("Sentence", sid, ":", elem.find("text").text)
+                  print ("-"*40)
 
-# Compute and show final results
-ss = compute_all(t_counts_sys, t_counts_base) # System scores
-sb = compute_all(t_counts_base) # Baseline scores
+              # Read hypothesis
+              hyp = f_hyp.readline().split()
+              src = elem.find("text").text.split()
+              # Get all possible valid references
+              ref_list = cg.get_candidates(elem, mix)
+              # Get the values for the best match among the references
+              best_ref, best_ref_counts, best_base_counts = \
+              get_best_ref_counts(sid, src, hyp, ref_list, t_counts_sys, t_counts_base, max_a, max_m, b, w, optimise, per_sent)
+              # Add to totals
+              print(t_counts_sys, best_ref_counts)
+              t_counts_sys  = add_counter_counter(t_counts_sys, best_ref_counts)
+              t_counts_base = add_counter_counter(t_counts_base, best_base_counts)
+              
+              if verbose:
+                  print ("\nCUMULATIVE RESULTS:")
+                  print ("Cumulative system counts:", t_counts_sys)
+                  print ("Cumulative system scores:", compute_all(t_counts_sys, t_counts_base))
+                  print ("Cumulative baseline counts:", t_counts_base)
+                  print ("Cumulative baseline scores:", compute_all(t_counts_base))
+              
+              # Free up
+              elem.clear()
+          elif elem.tag == "script":
+              # Free up processed elements
+              elem.clear()
+              root.clear()
+  f_hyp.close()
 
-print "\nOVERALL RESULTS"
-print_header()
-print_rows(ss, sb)
-print
+  # Compute and show final results
+  ss = compute_all(t_counts_sys, t_counts_base) # System scores
+  sb = compute_all(t_counts_base) # Baseline scores
+
+  print ("\nOVERALL RESULTS")
+  print_header()
+  print_rows(ss, sb)
+  print()
+
+if __name__ == "__main__":
+    main()

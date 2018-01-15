@@ -220,10 +220,10 @@ if __name__ == '__main__':
 
     # Do we have what we need?
     if not fn_in:
-        print '''Usage: python ''' + sys.argv[0] + ''' -in:<file> [-mix]
+        print ('''Usage: python ''' + sys.argv[0] + ''' -in:<file> [-mix]
         -in  : Gold standard XML file.
         -mix : Mix corrections from different annotators to generate all possible valid target sentences.
-        '''
+        ''')
         exit(0)
 
     ### PROCESS SENTENCES
@@ -236,14 +236,14 @@ if __name__ == '__main__':
         if event == "end":
             if elem.tag == "sentence":
                 reflist = cg.get_candidates(elem, mix)
-                print "[", elem.get("id"), "]", len(reflist), " generated reference(s).\n"
-                print "SRC:", elem.find("text").text, "\n"
+                print ("[", elem.get("id"), "]", len(reflist), " generated reference(s).\n")
+                print ("SRC:", elem.find("text").text, "\n")
                 for r in reflist:
-                    print "REF:", ' '.join(r.tokens)
+                    print ("REF:", ' '.join(r.tokens))
                     #raw_input("Press a key to continue...")
                     #sys.stdout.write("\033[A") # Go back one line
                     #sys.stdout.write(" "*30 + "\r")
-                print "-" * 20
+                print ("-" * 20)
                 # Free up
                 elem.clear()
             elif elem.tag == "script":
