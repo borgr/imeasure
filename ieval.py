@@ -37,7 +37,7 @@
 from collections import Counter
 import xml.etree.cElementTree as ET
 import candgen as CG
-import align as ALIGN
+import imeasure.align as ALIGN
 import math
 import sys
 import six
@@ -429,7 +429,7 @@ def main():
     if not file_ref or not file_hyp:
         print(help_str)
         exit(0)
-    return calculate_imeasure(file_ref, file_hyp, None, max_a, max_m, optimise, b, w, per_sent, mix, verbose)
+    return calculate_imeasure(file_ref, file_hyp, None, max_a, max_m, optimise, b, w, per_sent, mix, False, verbose, v_verbose)
 
 
 def add_counter_counter(c1, c2):
@@ -445,7 +445,7 @@ def add_counter_counter(c1, c2):
     return res
 
 
-def calculate_imeasure(file_ref, file_hyp=file_hyp, hyps=None, max_a=max_a, max_m=max_m, optimise=optimise, b=b, w=w, per_sent=per_sent, mix=mix, verbose=False, return_per_sent_scores=False):
+def calculate_imeasure(file_ref, file_hyp=file_hyp, hyps=None, max_a=max_a, max_m=max_m, optimise=optimise, b=b, w=w, per_sent=per_sent, mix=mix, quiet=False, verbose=False, v_verbose=False, return_per_sent_scores=False):
     if hyps is None and file_hyp is None:
       raise "Either hypothesis file or sentences list must be provided"
     if hyps is not None and file_hyp is not None:
@@ -467,12 +467,13 @@ def calculate_imeasure(file_ref, file_hyp=file_hyp, hyps=None, max_a=max_a, max_
     context = iter(context)
     event, root = next(context)
 
-    print_info(file_ref, file_hyp, max_a, max_m, optimise, b, w)
+    if not quiet:
+      print_info(file_ref, file_hyp, max_a, max_m, optimise, b, w)
 
     if return_per_sent_scores:
         sent_scores = []
     # Show results per sentence?
-    if per_sent:
+    if per_sent and not quiet:
         print("\nSENTENCE RESULTS")
         print_header(per_sent)
 
@@ -490,7 +491,7 @@ def calculate_imeasure(file_ref, file_hyp=file_hyp, hyps=None, max_a=max_a, max_
                 if file_hyp:
                   hyp = f_hyp.readline()
                 else:
-                  hyp = next(hyp)
+                  hyp = next(hyps)
                 hyp = hyp.split()
                 src = elem.find("text").text.split()
                 # Get all possible valid references
@@ -533,10 +534,11 @@ def calculate_imeasure(file_ref, file_hyp=file_hyp, hyps=None, max_a=max_a, max_
     ss = compute_all(t_counts_sys, t_counts_base)  # System scores # what a name for a variable...
     sb = compute_all(t_counts_base)  # Baseline scores
 
-    print("\nOVERALL RESULTS")
-    print_header()
-    print_rows(ss, sb)
-    print()
+    if not quiet:
+      print("\nOVERALL RESULTS")
+      print_header()
+      print_rows(ss, sb)
+      print()
 
     if return_per_sent_scores:
         return ss, sent_score
