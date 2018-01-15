@@ -74,6 +74,8 @@ class Alignment:
             for k in xrange(len(cost_jk[0])):
                 D[0, j, k] = cost_jk[j][k] + (j + k) * self.GAPCOST
 
+
+
     def _threeway_cost_table(self):
         s1, s2, s3 = self.sequences
 
@@ -84,20 +86,22 @@ class Alignment:
         D = numpy.empty(shape=(n1,n2,n3), dtype=int)
         self._initialize_costs(D, s1, s2, s3)
 
+        print("loop size:", n1*n2*n3)
         for i in xrange(1, n1):
             for j in xrange(1, n2):
                 for k in xrange(1, n3):
                     c_ij = self._pairwise_cost(s1[i-1], s2[j-1])
                     c_ik = self._pairwise_cost(s1[i-1], s3[k-1])
                     c_jk = self._pairwise_cost(s2[j-1], s3[k-1])
+                    cost = 2 * self.GAPCOST
 
                     d1 = D[i-1,j-1,k-1] + c_ij + c_ik + c_jk
-                    d2 = D[i-1, j-1, k] + c_ij + 2 * self.GAPCOST
-                    d3 = D[i-1, j, k-1] + c_ik + 2 * self.GAPCOST
-                    d4 = D[i, j-1, k-1] + c_jk + 2 * self.GAPCOST
-                    d5 = D[i-1, j, k] + 2 * self.GAPCOST
-                    d6 = D[i, j-1, k] + 2 * self.GAPCOST
-                    d7 = D[i, j, k-1] + 2 * self.GAPCOST
+                    d2 = D[i-1, j-1, k] + c_ij + cost
+                    d3 = D[i-1, j, k-1] + c_ik + cost
+                    d4 = D[i, j-1, k-1] + c_jk + cost
+                    d5 = D[i-1, j, k] + cost
+                    d6 = D[i, j-1, k] + cost
+                    d7 = D[i, j, k-1] + cost
                     
                     D[i, j, k] = min(d1, d2, d3, d4, d5, d6, d7)
         return D
