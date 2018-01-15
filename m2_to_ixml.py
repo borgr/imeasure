@@ -12,6 +12,7 @@ from elementtree.SimpleXMLWriter import XMLWriter
 from itertools import groupby
 import nltk # For tokenisation of corrections
 import sys
+from six.moves import xrange
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -66,7 +67,7 @@ for i in range(1,len(sys.argv)):
 
 # Do we have what we need?
 if not in_file:
-    print help_str
+    print (help_str)
     exit(0)
 
 # Read gold standard annotations
@@ -157,4 +158,4 @@ for s in xrange(len(ref_annot)):
     f_out.end("sentence")
 f_out.end("script")
 f_out.end("scripts")
-print ""
+print ("")

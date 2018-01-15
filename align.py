@@ -86,7 +86,6 @@ class Alignment:
         D = numpy.empty(shape=(n1,n2,n3), dtype=int)
         self._initialize_costs(D, s1, s2, s3)
 
-        print("loop size:", n1*n2*n3)
         for i in xrange(1, n1):
             for j in xrange(1, n2):
                 for k in xrange(1, n3):
