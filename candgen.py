@@ -11,7 +11,10 @@
 
 import sys
 import itertools
-
+from functools import reduce
+import random
+from six.moves import xrange
+import operator
 #### AUXILIARY CLASSES ####
 
 class SentCorrectionsIndex:
@@ -99,7 +102,9 @@ class CandidateGenerator:
             changes = 0
         return (corrected_string, changes)
 
-    def get_cart_product(self, multilist):
+    def get_cart_product(self, multilist, mixmax=None):
+        if mixmax is not None:
+            return (prod for i, prod in zip(range(mixmax), itertools.product(*multilist)))
         return itertools.product(*multilist)
 
     def has_duplicates(self, seq):
@@ -117,7 +122,7 @@ class CandidateGenerator:
     def flatten_list(self, seq):
         return list(itertools.chain(*seq))
 
-    def get_candidates(self, sentElement, mix=False):
+    def get_candidates(self, sentElement, mix=False, mixmax=None):
         # Don't keep duplicates
         targets = {}
         src = sentElement.find("text").text
@@ -131,27 +136,29 @@ class CandidateGenerator:
             # Generate candidates only if there are proposed corrections
             if corrIndex.clusters:
                 # Generate all possible combinations (cartesian product)
-                product = self.get_cart_product(corrIndex.clusters)
-                for edits in product:
-                    # No need to keep distinctions about corrections now
-                    edits = self.flatten_list(edits)
-                    if not edits:
-                        # No edits => original sentence
-                        # Remember candidate
-                        targets[src] = edits
-                    else:
-                        # Apply corrections if they are compatible
-                        if self.are_compatible(edits):
-                            tgt, changes = self.correct_sentence(src.split(), edits)
-                            # If the candidate has been generated before...
-                            if tgt in targets:
-                                # Keep this new version if it requires fewer edits
-                                if len(edits) < len(targets[tgt]):
+                product = self.get_cart_product(corrIndex.clusters, mixmax)
+                # Subsample mixed references to the maximum allowed number
+                for prod_idx, edits in enumerate(product):
+                    if mixmax is not None or prod_idx in mixmax:
+                        # No need to keep distinctions about corrections now
+                        edits = self.flatten_list(edits)
+                        if not edits:
+                            # No edits => original sentence
+                            # Remember candidate
+                            targets[src] = edits
+                        else:
+                            # Apply corrections if they are compatible
+                            if self.are_compatible(edits):
+                                tgt, changes = self.correct_sentence(src.split(), edits)
+                                # If the candidate has been generated before...
+                                if tgt in targets:
+                                    # Keep this new version if it requires fewer edits
+                                    if len(edits) < len(targets[tgt]):
+                                        targets[tgt] = edits
+                                else:
                                     targets[tgt] = edits
-                            else:
-                                targets[tgt] = edits
-                        #else:
-                        #    print "EDITS ARE NOT COMPATIBLE!!!"
+                            #else:
+                            #    print "EDITS ARE NOT COMPATIBLE!!!"
             else:
                 return [Candidate(src.split(),[])]
         else: # Don't mix corrections

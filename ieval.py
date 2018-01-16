@@ -80,6 +80,7 @@ file_hyp = None
 verbose = False
 v_verbose = False
 mix = True  # Mix independent corrections
+mixmax = None
 max_a = C     # Aspect
 max_m = WACC  # Metric
 max_metric = (max_a, max_m)
@@ -368,6 +369,7 @@ Usage: python ''' + sys.argv[0] + ''' -ref:<file> -hyp:<file> [-nomix] [-max:<me
 \t -nomix : Do not mix corrections from different annotators; match the best individual reference instead.
 \t          By default, the scorer will mix such corrections in order to maximise matches. This option disables 
 \t          default behaviour.
+\t -mixmax: Mix corrections from different annotators, but create maximum of mixmax annotations.
 \t -max   : Maximise scores for the specified metric: dp, dr, df, dacc, dwacc, di, cp, cr, cf, cacc, cwacc or ci.
 \t          Preceding 'd' is for detection, 'c' for correction. Available metrics are: tp (true positives), 
 \t          tn (true negatives), fp (false positives), fn (false negatives), p (precision), r (recall), 
@@ -417,6 +419,8 @@ def main():
             w = float(sys.argv[i][3:])
         elif sys.argv[i] == "-nomix":
             mix = False
+        elif sys.argv[i] == "-mixmax:":
+            mixmax = float(sys.argv[i][8:])
         elif sys.argv[i] == "-per-sent":
             per_sent = True
         elif sys.argv[i] == "-vv":
@@ -429,7 +433,7 @@ def main():
     if not file_ref or not file_hyp:
         print(help_str)
         exit(0)
-    return calculate_imeasure(file_ref, file_hyp, None, max_a, max_m, optimise, b, w, per_sent, mix, False, verbose, v_verbose)
+    return calculate_imeasure(file_ref, file_hyp, None, max_a, max_m, optimise, b, w, per_sent, mix, mixmax, False, verbose, v_verbose)
 
 
 def add_counter_counter(c1, c2):
@@ -445,11 +449,9 @@ def add_counter_counter(c1, c2):
     return res
 
 
-def calculate_imeasure(file_ref, file_hyp=file_hyp, hyps=None, max_a=max_a, max_m=max_m, optimise=optimise, b=b, w=w, per_sent=per_sent, mix=mix, quiet=False, verbose=False, v_verbose=False, return_per_sent_scores=False):
-    if hyps is None and file_hyp is None:
-      raise "Either hypothesis file or sentences list must be provided"
-    if hyps is not None and file_hyp is not None:
-      raise "Pass either an hypothesis file or sentences list, function got both"
+def calculate_imeasure(file_ref, file_hyp=file_hyp, hyps=None, max_a=max_a, max_m=max_m, optimise=optimise, b=b, w=w, per_sent=per_sent, mix=mix, mixmax=mixmax, quiet=False, verbose=False, v_verbose=False, return_per_sent_scores=False):
+    assert hyps is not None or file_hyp is not None, "Either hypothesis file or sentences list must be provided"
+    assert not(hyps is not None and file_hyp is not None), "Pass either an hypothesis file or sentences list, function got both"
     # Totals
     # System
     t_counts_sys = Counter({D: Counter({TP: 0, TN: 0, FP: 0, FN: 0, FPN: 0}),
@@ -495,7 +497,7 @@ def calculate_imeasure(file_ref, file_hyp=file_hyp, hyps=None, max_a=max_a, max_
                 hyp = hyp.split()
                 src = elem.find("text").text.split()
                 # Get all possible valid references
-                ref_list = cg.get_candidates(elem, mix)
+                ref_list = cg.get_candidates(elem, mix, mixmax)
                 # Get the values for the best match among the references
                 best_ref, best_ref_counts, best_base_counts = \
                     get_best_ref_counts(sid, src, hyp, ref_list, t_counts_sys,
