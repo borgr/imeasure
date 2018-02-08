@@ -103,7 +103,11 @@ class CandidateGenerator:
         return (corrected_string, changes)
 
     def get_cart_product(self, multilist, mixmax=None):
-        if mixmax is not None:
+        if mixmax is not None and mixmax < reduce(operator.mul, [len(cluster) for cluster in multilist], 1):
+            refs = set()
+            while len(refs) < mixmax:
+                refs.add([random.sample(cluster, 1) for cluster in multilist])
+            return refs
             return (prod for i, prod in zip(range(mixmax), itertools.product(*multilist)))
         return itertools.product(*multilist)
 
@@ -139,7 +143,7 @@ class CandidateGenerator:
                 product = self.get_cart_product(corrIndex.clusters, mixmax)
                 # Subsample mixed references to the maximum allowed number
                 for prod_idx, edits in enumerate(product):
-                    if mixmax is not None or prod_idx in mixmax:
+                    if mixmax is not None:
                         # No need to keep distinctions about corrections now
                         edits = self.flatten_list(edits)
                         if not edits:
@@ -159,6 +163,7 @@ class CandidateGenerator:
                                     targets[tgt] = edits
                             #else:
                             #    print "EDITS ARE NOT COMPATIBLE!!!"
+                print("prod", prod_idx)
             else:
                 return [Candidate(src.split(),[])]
         else: # Don't mix corrections
